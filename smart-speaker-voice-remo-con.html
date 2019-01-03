@@ -1,0 +1,108 @@
+<title>スマートスピーカリモコン</title>
+<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+
+<p>「オーケーグーグル」をつけて文章を読み上げます。<br>
+「;」をつければ間を開けて連続で読み上げ、「。」で時間調整ができます。<br>
+<a href="https://androidlover.net/google-assistant-command">Google Home(Googleアシスタント)のコマンド一覧とできることまとめ</a>
+</p>
+
+<h2>自由入力</h2>
+<input id="text" type="text" value="こんにちは">
+<input id="speech" type="button" value="speech">
+<input id="cancel" type="button" value="calcel">
+
+
+<h2>サンプル</h2>
+<input class="message" type="button" value="なにかおもしろいことをいって">
+<br>
+<input class="message" type="button" value="明かりの明るさを30にして">
+<br>
+<input class="message" type="button" value="明かりの明るさを100にして;明かりの明るさを30にして;明日の天気は">
+
+<h2>音量</h2>
+<input class="message" type="button" value="音量をあげて">
+<input class="message" type="button" value="音量をさげて">
+
+<h2>音楽</h2>
+<input class="message" type="button" value="何か音楽を再生して">
+<input class="message" type="button" value="ジャズを再生して">
+<input class="message" type="button" value="音楽を止めて">
+
+<h2>ニュース</h2>
+<input class="message" type="button" value="最新のニュース">
+<input class="message" type="button" value="ニュースを止めて">
+
+<h2>天気</h2>
+<input class="message" type="button" value="今日の天気は">
+
+<h2>情報</h2>
+<input class="message" type="button" value="イルカの鳴き声は">
+<input class="message" type="button" value="TPPの意味は">
+<input class="message" type="button" value="1ドルは何円">
+<input class="message" type="button" value="日経平均は">
+<input class="message" type="button" value="ここから目黒駅まで電車で何分かかる">
+<input class="message" type="button" value="目黒駅からここまでの終電は何時">
+
+
+<h2>アラーム・タイマー</h2>
+<input class="message" type="button" value="アラームを3分後に設定">
+<input class="message" type="button" value="アラームを止めて">
+<input class="message" type="button" value="タイマーを3分後に設定">
+<input class="message" type="button" value="タイマーを止めて">
+
+<h2>予定</h2>
+<input class="message" type="button" value="今日の予定は">
+
+<h2>その他</h2>
+<input class="message" type="button" value="気分はどう">
+
+<script>
+    $(function() {
+        // .getVoices()は一度呼んでおかないとうまく動かないことがある
+        // https://app.codegrid.net/entry/2016-web-speech-api-1
+        speechSynthesis.getVoices();
+
+        function createUtteranceInstance(message){
+            // SpeechSynthesisUtteranceを毎回作成することで順番に発声する
+            // https://xov.jp/e/95/
+            var utterance = new SpeechSynthesisUtterance();
+            // よりはっきりした声で。非同期なので、毎回設定。
+            var voice = speechSynthesis.getVoices().find(function(voice){
+                return voice.name === 'Google 日本語';
+            });;
+
+            console.log(message);
+            console.log(voice);
+
+            utterance.voice = voice;
+            utterance.text  = message;
+            return utterance;
+        }
+
+        function say(messages){
+            messages = messages.split(";");
+            messages.forEach(function(message, index){
+                var voice_command = createUtteranceInstance("オーケーグーグル。" + message);
+                speechSynthesis.speak(voice_command);
+                if( index < ( messages.length - 1)){
+                    // 句点を話すことによりウェイト
+                    var voice_command = createUtteranceInstance("。".repeat(50));
+                    speechSynthesis.speak(voice_command);
+                }
+            });
+        }
+
+        $('#speech').click(function(){
+            say($("#text").val());
+        });
+
+        $('.message[type="BUTTON"]').click(function(){
+            say($(this).val());
+        });
+
+        $('#cancel').click(function(){
+            speechSynthesis.cancel();
+        });
+    });
+
+</script>
