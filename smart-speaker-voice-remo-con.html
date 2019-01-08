@@ -56,6 +56,10 @@
 <h2>その他</h2>
 <input class="message" type="button" value="気分はどう">
 
+<h2>おまけ</h2>
+<p>なんか入力してエンターで発声</p>
+<input type="text" id="omake">
+
 <script>
     $(function() {
         // .getVoices()は一度呼んでおかないとうまく動かないことがある
@@ -103,6 +107,14 @@
         $('#cancel').click(function(){
             speechSynthesis.cancel();
         });
+        
+        $('#omake').keypress(function(e){
+	        if(e.which == 13){
+		        var voice_command = createUtteranceInstance($('#omake').val());
+                speechSynthesis.speak(voice_command);
+                $('#omake').val("");
+            }
+	    });
     });
 
 </script>
